@@ -18,6 +18,11 @@ public interface IAuthService
 {
     Task RegisterAsync(RegisterStudentRequest request, CancellationToken ct);
     Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken ct);
+
+    Task ChangePasswordAsync(
+        int studentId,
+        ChangePasswordRequest request,
+        CancellationToken ct);
 }
 
 public interface IStudentService

@@ -1,4 +1,4 @@
-using Enrollora.Api.DTOs;
+﻿using Enrollora.Api.DTOs;
 using Enrollora.Api.Models;
 using Enrollora.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -61,4 +61,33 @@ public sealed class AuthService(
         return tokens.CreateToken(
             student.StudentId.ToString(), student.Name, student.Email, "Student");
     }
+
+    public async Task ChangePasswordAsync(
+        int studentId,
+        ChangePasswordRequest request,
+        CancellationToken ct)
+    {
+        var student = await students.Query()
+            .FirstOrDefaultAsync(x => x.StudentId == studentId, ct);
+
+        if (student is null)
+            throw new KeyNotFoundException("Student not found.");
+
+        if (!hasher.Verify(student.PasswordHash, request.CurrentPassword))
+            throw new UnauthorizedAccessException("Current password is incorrect.");
+
+        if (request.NewPassword != request.ConfirmPassword)
+            throw new ArgumentException("New password and confirm password do not match.");
+
+        if (request.NewPassword.Length < 8)
+            throw new ArgumentException("New password must contain at least 8 characters.");
+
+        if (hasher.Verify(student.PasswordHash, request.NewPassword))
+            throw new ArgumentException("New password must be different from current password.");
+
+        student.PasswordHash = hasher.Hash(request.NewPassword);
+
+        await students.SaveChangesAsync(ct);
+    }
 }
+

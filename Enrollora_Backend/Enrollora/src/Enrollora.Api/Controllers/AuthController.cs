@@ -1,4 +1,4 @@
-using Enrollora.Api.DTOs;
+﻿using Enrollora.Api.DTOs;
 using Enrollora.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,4 +24,22 @@ public sealed class AuthController(IAuthService authService) : ControllerBase
     public async Task<ActionResult<LoginResponse>> Login(
         LoginRequest request, CancellationToken ct) =>
         Ok(await authService.LoginAsync(request, ct));
+
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Student")]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(
+        ChangePasswordRequest request,
+        CancellationToken ct)
+    {
+        var idClaim = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!int.TryParse(idClaim, out var studentId))
+            return Unauthorized();
+
+        await authService.ChangePasswordAsync(studentId, request, ct);
+
+        return Ok(new { message = "Password changed successfully." });
+    }
 }
+

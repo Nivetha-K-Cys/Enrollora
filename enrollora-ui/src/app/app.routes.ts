@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { roleGuard } from './core/guards/role-guard';
 
@@ -64,6 +64,12 @@ export const routes: Routes = [
     },
 
       {
+
+        path: 'change-password',
+        loadComponent: () =>
+          import('./features/student/change-password/change-password').then((m) => m.ChangePassword),
+      },
+      {
         path: 'courses',
         loadComponent: () =>
           import('./features/enrollments/student/available-courses/available-courses').then(
@@ -94,3 +100,4 @@ export const routes: Routes = [
     redirectTo: 'login',
   },
 ];
+

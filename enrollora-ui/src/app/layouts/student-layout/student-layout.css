@@ -209,3 +209,17 @@
     padding: 0 17px;
   }
 }
+/* Keep Change Password menu visible on smaller screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+
+  .nav-link[routerLink="/student/change-password"] {
+    font-size: 13px;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+}
