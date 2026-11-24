@@ -163,6 +163,47 @@ namespace Enrollora.Api.Migrations
                     b.ToTable("Enrollments");
                 });
 
+            modelBuilder.Entity("Enrollora.Api.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("PasswordResetTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PasswordResetTokenId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("PasswordResetTokenId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("Enrollora.Api.Models.Student", b =>
                 {
                     b.Property<int>("StudentId")
@@ -253,6 +294,17 @@ namespace Enrollora.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Enrollora.Api.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("Enrollora.Api.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Student");
                 });

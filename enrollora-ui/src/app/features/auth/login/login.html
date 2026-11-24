@@ -1,4 +1,4 @@
-<div class="container mt-5">
+﻿<div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-5">
       <div class="card shadow">
@@ -33,6 +33,10 @@
               />
             </div>
 
+            <div class="text-end mb-3">
+              <a routerLink="/forgot-password">Forgot Password?</a>
+            </div>
+
             @if (errorMessage) {
               <div class="alert alert-danger">
                 {{ errorMessage }}
@@ -56,3 +60,4 @@
     </div>
   </div>
 </div>
+

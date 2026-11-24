@@ -1,3 +1,5 @@
+﻿using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 using Microsoft.OpenApi;
 using Enrollora.Api.Data;
@@ -82,11 +84,40 @@ builder.Services.AddScoped<ICancellationRequestService, CancellationRequestServi
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
+// Feature 3 - Password Reset
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IEmailService, DevelopmentEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, EmailService>();
+}
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("PasswordReset", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+});
+
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();
 app.UseCors("AngularClient");
+app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -100,3 +131,4 @@ app.MapControllers();
 
 await DbSeeder.SeedAsync(app.Services, app.Configuration);
 app.Run();
+

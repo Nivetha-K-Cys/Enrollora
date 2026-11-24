@@ -12,9 +12,21 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<CancellationRequest> CancellationRequests => Set<CancellationRequest>();
 
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasIndex(x => x.TokenHash)
+            .IsUnique();
+
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasOne(x => x.Student)
+            .WithMany()
+            .HasForeignKey(x => x.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Student>()
             .HasIndex(x => x.Email)

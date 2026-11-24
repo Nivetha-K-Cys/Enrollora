@@ -4,6 +4,16 @@ import { roleGuard } from './core/guards/role-guard';
 
 export const routes: Routes = [
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
@@ -100,4 +110,5 @@ export const routes: Routes = [
     redirectTo: 'login',
   },
 ];
+
 
