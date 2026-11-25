@@ -1,11 +1,14 @@
-using Enrollora.Api.DTOs;
+﻿using Enrollora.Api.DTOs;
 using Enrollora.Api.Models;
 using Enrollora.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Enrollora.Api.Services;
 
-public sealed class StudentService(IRepository<Student> students) : IStudentService
+public sealed class StudentService(
+    IRepository<Student> students,
+    IRepository<AdminUser> admins,
+    IPasswordHasher hasher) : IStudentService
 {
     public async Task<PagedResult<StudentResponse>> GetStudentsAsync(StudentQuery query, CancellationToken ct)
     {
@@ -92,6 +95,36 @@ public sealed class StudentService(IRepository<Student> students) : IStudentServ
 
         students.Remove(student);
         await students.SaveChangesAsync(ct);
+    }
+
+    public async Task<StudentResponse> CreateAsync(
+        CreateStudentRequest request, CancellationToken ct)
+    {
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (await students.Query().AnyAsync(x => x.Email == email, ct) ||
+            await admins.Query().AnyAsync(x => x.Email == email, ct))
+        {
+            throw new InvalidOperationException(
+                "An account with this email already exists.");
+        }
+
+        var student = new Student
+        {
+            Name = request.Name.Trim(),
+            Email = email,
+            PasswordHash = hasher.Hash(request.Password),
+            Department = request.Department.Trim(),
+            Age = request.Age,
+            CGPA = request.CGPA,
+            Status = StudentStatus.Pending,
+            RegisteredAt = DateTime.UtcNow
+        };
+
+        await students.AddAsync(student, ct);
+        await students.SaveChangesAsync(ct);
+
+        return Map(student);
     }
 
     private async Task<Student> FindAsync(int id, CancellationToken ct) =>

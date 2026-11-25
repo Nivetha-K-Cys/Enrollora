@@ -1,4 +1,4 @@
-<div class="students-page">
+﻿<div class="students-page">
   <div class="page-heading">
     <div>
       <h2>Students</h2>
@@ -6,6 +6,9 @@
     </div>
 
     <div class="student-count">Total Students: {{ totalRecords }}</div>
+    <button type="button" class="btn btn-primary" (click)="openAddModal()">
+      <i class="bi bi-plus-lg"></i> Add Student
+    </button>
   </div>
 
   @if (isLoading) {
@@ -27,7 +30,7 @@
             <h5>Filter Students</h5>
             <p>Find students using search and filter criteria</p>
           </div>
-          <span class="filter-icon">☷</span>
+          <span class="filter-icon">â˜·</span>
         </div>
 
         <div class="row g-3">
@@ -452,6 +455,166 @@
               Update Student
             </button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Add Student Success Message -->
+@if (addStudentSuccess) {
+  <div class="alert alert-success mt-3">
+    {{ addStudentSuccess }}
+    <button type="button" class="btn-close float-end"
+      (click)="addStudentSuccess = ''"
+      aria-label="Close">
+    </button>
+  </div>
+}
+
+<!-- Add Student Modal -->
+@if (isAddModalOpen) {
+  <div class="student-modal-backdrop">
+    <div class="student-modal">
+      <div class="student-modal-header">
+        <div>
+          <span class="modal-eyebrow">STUDENT MANAGEMENT</span>
+          <h3>Add Student</h3>
+          <p>Enter new student information</p>
+        </div>
+
+        <button type="button"
+          class="modal-close"
+          [disabled]="isAddingStudent"
+          (click)="closeAddModal()">
+          &times;
+        </button>
+      </div>
+
+      <div class="student-modal-body">
+
+        @if (addStudentError) {
+          <div class="alert alert-danger">
+            {{ addStudentError }}
+          </div>
+        }
+
+        <form [formGroup]="addStudentForm"
+          (ngSubmit)="addStudent()">
+
+          <div class="mb-3">
+            <label class="form-label">Student Name</label>
+            <input type="text"
+              class="form-control"
+              formControlName="name"
+              placeholder="Enter student name" />
+
+            @if (addStudentForm.controls.name.touched &&
+                 addStudentForm.controls.name.invalid) {
+              <small class="text-danger">
+                Enter a valid student name (max 120 characters).
+              </small>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+              class="form-control"
+              formControlName="email"
+              placeholder="Enter email address" />
+
+            @if (addStudentForm.controls.email.touched &&
+                 addStudentForm.controls.email.invalid) {
+              <small class="text-danger">
+                Enter a valid email address.
+              </small>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password"
+              class="form-control"
+              formControlName="password"
+              autocomplete="new-password"
+              placeholder="Minimum 8 characters" />
+
+            @if (addStudentForm.controls.password.touched &&
+                 addStudentForm.controls.password.invalid) {
+              <small class="text-danger">
+                Password must contain at least 8 characters.
+              </small>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Department</label>
+            <select class="form-select"
+              formControlName="department">
+              <option value="">Select Department</option>
+              <option value="CSE">CSE</option>
+              <option value="ECE">ECE</option>
+              <option value="EEE">EEE</option>
+              <option value="IT">IT</option>
+              <option value="Mechanical">Mechanical</option>
+            </select>
+
+            @if (addStudentForm.controls.department.touched &&
+                 addStudentForm.controls.department.invalid) {
+              <small class="text-danger">
+                Select a department.
+              </small>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">Age</label>
+              <input type="number"
+                class="form-control"
+                formControlName="age"
+                min="17" max="60" step="1" />
+
+              @if (addStudentForm.controls.age.touched &&
+                   addStudentForm.controls.age.invalid) {
+                <small class="text-danger">
+                  Age must be between 17 and 60.
+                </small>
+              }
+            </div>
+
+            <div class="col-6 mb-3">
+              <label class="form-label">CGPA</label>
+              <input type="number"
+                class="form-control"
+                formControlName="cgpa"
+                min="0" max="10" step="0.01" />
+
+              @if (addStudentForm.controls.cgpa.touched &&
+                   addStudentForm.controls.cgpa.invalid) {
+                <small class="text-danger">
+                  CGPA must be between 0 and 10.
+                </small>
+              }
+            </div>
+          </div>
+
+          <div class="student-modal-footer">
+            <button type="button"
+              class="btn btn-light"
+              [disabled]="isAddingStudent"
+              (click)="closeAddModal()">
+              Cancel
+            </button>
+
+            <button type="submit"
+              class="btn-close-modal"
+              [disabled]="addStudentForm.invalid || isAddingStudent">
+              {{ isAddingStudent ? 'Adding...' : 'Add Student' }}
+            </button>
+          </div>
+
         </form>
       </div>
     </div>

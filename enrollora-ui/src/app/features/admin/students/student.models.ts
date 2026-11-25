@@ -27,3 +27,12 @@ export interface UpdateStudentRequest {
   age: number;
   cgpa: number;
 }
+
+export interface CreateStudentRequest {
+  name: string;
+  email: string;
+  password: string;
+  department: string;
+  age: number;
+  cgpa: number;
+}

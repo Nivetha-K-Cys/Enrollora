@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Enrollora.Api.DTOs;
 using Enrollora.Api.Models;
 using Enrollora.Api.Services;
@@ -22,6 +22,19 @@ public sealed class StudentsController(IStudentService service) : ControllerBase
     [Authorize(Roles = "Administrator")]
     public Task<StudentResponse> GetById(int id, CancellationToken ct) =>
         service.GetByIdAsync(id, ct);
+
+    [HttpPost]
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<StudentResponse>> Create(
+        CreateStudentRequest request, CancellationToken ct)
+    {
+        var student = await service.CreateAsync(request, ct);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = student.StudentId },
+            student);
+    }
 
     [HttpGet("me")]
     [Authorize(Roles = "Student")]

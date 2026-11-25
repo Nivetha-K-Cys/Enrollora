@@ -1,7 +1,8 @@
-using Enrollora.Api.DTOs;
+﻿using Enrollora.Api.DTOs;
 using Enrollora.Api.Models;
 
 namespace Enrollora.Api.Services;
+
 
 public interface IPasswordHasher
 {
@@ -29,6 +30,7 @@ public interface IStudentService
 {
     Task<PagedResult<StudentResponse>> GetStudentsAsync(StudentQuery query, CancellationToken ct);
     Task<StudentResponse> GetByIdAsync(int id, CancellationToken ct);
+    Task<StudentResponse> CreateAsync(CreateStudentRequest request, CancellationToken ct);
     Task<StudentResponse> GetMeAsync(int studentId, CancellationToken ct);
     Task<StudentResponse> UpdateMeAsync(int studentId, UpdateStudentRequest request, CancellationToken ct);
     Task<StudentResponse> UpdateAsync(int id, UpdateStudentRequest request, CancellationToken ct);

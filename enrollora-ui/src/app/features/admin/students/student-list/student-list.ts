@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { StudentService } from '../student.service';
-import { StudentResponse, StudentFilter, UpdateStudentRequest } from '../student.models';
+import { StudentResponse, StudentFilter, UpdateStudentRequest, CreateStudentRequest } from '../student.models';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -160,6 +160,110 @@ export class StudentList implements OnInit {
         this.isDetailsLoading = false;
         this.cdr.markForCheck();
       },
+    });
+  }
+
+  // Add Student functionality
+  isAddModalOpen = false;
+  isAddingStudent = false;
+  addStudentError = '';
+  addStudentSuccess = '';
+
+  addStudentForm = new FormGroup({
+    name: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(120),
+      Validators.pattern(/\S/)
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(256)
+    ]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8)
+    ]),
+    department: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(100),
+      Validators.pattern(/\S/)
+    ]),
+    age: new FormControl(18, [
+      Validators.required,
+      Validators.min(17),
+      Validators.max(60),
+      Validators.pattern(/^\d+$/)
+    ]),
+    cgpa: new FormControl(0, [
+      Validators.required,
+      Validators.min(0),
+      Validators.max(10)
+    ])
+  });
+
+  openAddModal(): void {
+    this.addStudentError = '';
+    this.addStudentSuccess = '';
+    this.addStudentForm.reset({
+      name: '',
+      email: '',
+      password: '',
+      department: '',
+      age: 18,
+      cgpa: 0
+    });
+    this.isAddModalOpen = true;
+  }
+
+  closeAddModal(): void {
+    if (this.isAddingStudent) {
+      return;
+    }
+
+    this.isAddModalOpen = false;
+    this.addStudentError = '';
+    this.addStudentForm.reset();
+  }
+
+  addStudent(): void {
+    if (this.addStudentForm.invalid || this.isAddingStudent) {
+      this.addStudentForm.markAllAsTouched();
+      return;
+    }
+
+    this.isAddingStudent = true;
+    this.addStudentError = '';
+    this.addStudentSuccess = '';
+
+    const formValue = this.addStudentForm.getRawValue();
+
+    const studentData: CreateStudentRequest = {
+      name: formValue.name!.trim(),
+      email: formValue.email!.trim(),
+      password: formValue.password!,
+      department: formValue.department!.trim(),
+      age: formValue.age!,
+      cgpa: formValue.cgpa!
+    };
+
+    this.studentService.createStudent(studentData).subscribe({
+      next: () => {
+        this.isAddingStudent = false;
+        this.closeAddModal();
+        this.addStudentSuccess = 'Student added successfully!';
+        this.pageNumber = 1;
+        this.loadStudents();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.isAddingStudent = false;
+        this.addStudentError =
+          error.error?.detail ||
+          error.error?.title ||
+          'Unable to add student. Please try again.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
