@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -51,6 +51,14 @@ export class CourseService {
       if (filters.maxCapacity !== null && filters.maxCapacity !== undefined) {
         params = params.set('maxCapacity', filters.maxCapacity);
       }
+    }
+
+    if (filters?.sortBy) {
+      params = params.set('sortBy', filters.sortBy);
+    }
+
+    if (filters?.sortOrder) {
+      params = params.set('sortOrder', filters.sortOrder);
     }
 
     return this.http.get<PagedResult<CourseResponse>>(this.apiUrl, { params });

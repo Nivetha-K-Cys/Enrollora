@@ -1,4 +1,4 @@
-import { PagedResult } from '../../../shared/models/paged-result.model';
+﻿import { PagedResult } from '../../../shared/models/paged-result.model';
 
 export interface CourseResponse {
   courseId: number;
@@ -20,6 +20,8 @@ export interface SaveCourseRequest {
 }
 
 export interface CourseFilter {
+  sortBy?: string;
+  sortOrder?: string;
   search?: string;
   isActive?: boolean | null;
   availability?: string;
